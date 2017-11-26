@@ -1,0 +1,17 @@
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\Kay.WebApi.dll.config
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\Kay.WebApi.dll
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\Kay.WebApi.pdb
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\Newtonsoft.Json.dll
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\System.Net.Http.Formatting.dll
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\System.Web.Cors.dll
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\System.Web.Http.Cors.dll
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\System.Web.Http.dll
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\System.Web.Http.WebHost.dll
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\Newtonsoft.Json.xml
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\System.Net.Http.Formatting.xml
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\System.Web.Http.xml
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\System.Web.Http.Cors.xml
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\bin\Debug\System.Web.Http.WebHost.xml
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\obj\Debug\00-Kay.WebApi.csproj.CoreCompileInputs.cache
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\obj\Debug\Kay.WebApi.dll
+C:\Users\fortunen\Documents\Visual Studio 2017\Projects\KayWebApi\Kay.KWebApi\obj\Debug\Kay.WebApi.pdb

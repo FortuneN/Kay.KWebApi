@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+	<metadata>
+		<id>Kay.KWebApi</id>
+		<version>0.0.1</version>
+		<title>Kay.KWebApi</title>
+		<authors>FortuneN</authors>
+		<owners>FortuneN</owners>
+		<licenseUrl>https://cdn.rawgit.com/FortuneN/Kay.KWebApi/bd9dc53e/LICENSE</licenseUrl>
+		<projectUrl>https://github.com/FortuneN/Kay.KWebApi</projectUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<description>Neat web api stuff</description>
+		<copyright>Copyright 2017</copyright>
+		<tags>WebApi, RPC</tags>
+	</metadata>
+	<files>
+		<file src="bin\debug\Kay.KWebApi.dll" target="lib"></file>
+	</files>
+</package>
