@@ -6,7 +6,7 @@
 		<title>Kay.KWebApi</title>
 		<authors>FortuneN</authors>
 		<owners>FortuneN</owners>
-		<licenseUrl>https://cdn.rawgit.com/FortuneN/Kay.KWebApi/bd9dc53e/LICENSE</licenseUrl>
+		<licenseUrl>https://github.com/FortuneN/Kay.KWebApi/blob/master/LICENSE</licenseUrl>
 		<projectUrl>https://github.com/FortuneN/Kay.KWebApi</projectUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 		<description>Neat web api stuff</description>
