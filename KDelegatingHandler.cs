@@ -14,7 +14,7 @@ namespace Kay.KWebApi
 			InnerHandler = new HttpControllerDispatcher(httpConfiguration);
 		}
 
-		async protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+		protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
 			var response = await base.SendAsync(request, cancellationToken);
 
@@ -43,7 +43,7 @@ namespace Kay.KWebApi
 
 				if (kFileInfo != null)
 				{
-					return kFileInfo.AsResponse(true);
+					response = kFileInfo.AsResponse(true);
 				}
 			}
 

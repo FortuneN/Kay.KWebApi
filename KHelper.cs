@@ -3,26 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace Kay.KWebApi
 {
 	internal static class KHelper
 	{
+		public static HttpConfiguration Config { get; internal set; }
+		public static bool OutputCamelCase { get; internal set; }
+		public static string BaseNamespace { get; internal set; }
+
 		public static JsonSerializerSettings JsonSerializerSettings
 		{
 			get
 			{
-				return new JsonSerializerSettings
+				var settings = new JsonSerializerSettings
 				{
 					Formatting = Formatting.None,
 					Converters = { new IsoDateTimeConverter() },
 					ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
 					NullValueHandling = NullValueHandling.Ignore,
-					Error = delegate (object sender, Newtonsoft.Json.Serialization.ErrorEventArgs args) { args.ErrorContext.Handled = true; },
+					Error = delegate (object sender, ErrorEventArgs args) { args.ErrorContext.Handled = true; },
 					MaxDepth = int.MaxValue
 				};
+
+				if (OutputCamelCase)
+				{
+					settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+					Config.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;
+				}
+
+				return settings;
 			}
 		}
 
@@ -33,7 +47,7 @@ namespace Kay.KWebApi
 				return JsonSerializer.Create(JsonSerializerSettings);
 			}
 		}
-
+		
 		public static string GetMimeType(string pathOrExtenstion)
 		{
 			if (pathOrExtenstion == null)

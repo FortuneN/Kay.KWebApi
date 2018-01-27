@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Collections.Generic;
 using System;
+using Newtonsoft.Json;
 
 namespace Kay.KWebApi
 {
@@ -19,7 +20,7 @@ namespace Kay.KWebApi
 		{
 		}
 
-		public override Task ExecuteBindingAsync(ModelMetadataProvider metadataProvider, HttpActionContext actionContext, CancellationToken cancellationToken)
+		public override async Task ExecuteBindingAsync(ModelMetadataProvider metadataProvider, HttpActionContext actionContext, CancellationToken cancellationToken)
 		{
 			if (actionContext.ActionDescriptor.GetCustomAttributes<KMethod>().Any())
 			{
@@ -27,11 +28,11 @@ namespace Kay.KWebApi
 
 				try
 				{
-					ResetStream(actionContext.Request.Content.ReadAsStreamAsync().Result);
+					ResetStream(await actionContext.Request.Content.ReadAsStreamAsync());
 
 					// TYPE : query string
 
-					var queryValues = actionContext.Request.GetQueryNameValuePairs().Where(x => x.Key.Equals(Descriptor.ParameterName));
+					var queryValues = actionContext.Request.GetQueryNameValuePairs().Where(x => x.Key.Equals(Descriptor.ParameterName, StringComparison.OrdinalIgnoreCase));
 					if (queryValues.Any())
 					{
 						value = ConvertValueToParameterType(queryValues.First().Value);
@@ -41,46 +42,46 @@ namespace Kay.KWebApi
 
 					if (actionContext.Request.Content.IsMimeMultipartContent())
 					{
-						var provider = actionContext.Request.Content.ReadAsMultipartAsync().Result;
+						var provider = await actionContext.Request.Content.ReadAsMultipartAsync();
 						try
 						{
-							var httpContent = provider.Contents.FirstOrDefault(hc => hc.Headers.ContentDisposition.Name.Equals(Descriptor.ParameterName) || hc.Headers.ContentDisposition.Name.Equals($"\"{Descriptor.ParameterName}\""));
+							var httpContent = provider.Contents.FirstOrDefault(hc => hc.Headers.ContentDisposition.Name.Equals(Descriptor.ParameterName, StringComparison.OrdinalIgnoreCase) || hc.Headers.ContentDisposition.Name.Equals($"\"{Descriptor.ParameterName}\"", StringComparison.OrdinalIgnoreCase));
 							if (httpContent != null)
 							{
 								if (string.IsNullOrWhiteSpace(httpContent.Headers.ContentDisposition.FileName) && string.IsNullOrWhiteSpace(httpContent.Headers.ContentDisposition.FileNameStar))
 								{
-									value = ConvertValueToParameterType(httpContent.ReadAsStringAsync().Result);
+									value = ConvertValueToParameterType(await httpContent.ReadAsStringAsync());
 								}
 								else
 								{
 									if (Descriptor.ParameterType == typeof(KFileInfo))
 									{
-										value = KFileInfo.FromStream(httpContent.ReadAsStreamAsync().Result);
+										value = KFileInfo.FromStream(await httpContent.ReadAsStreamAsync(), string.IsNullOrWhiteSpace(httpContent.Headers.ContentDisposition.FileName.Trim(' ', '"')) ? httpContent.Headers.ContentDisposition.FileNameStar.Trim(' ', '"') : httpContent.Headers.ContentDisposition.FileName.Trim(' ', '"'), httpContent.Headers.ContentType.MediaType, httpContent.Headers.ContentLength);
 									}
 									else if (Descriptor.ParameterType == typeof(byte[]))
 									{
-										value = httpContent.ReadAsByteArrayAsync().Result;
+										value = await httpContent.ReadAsByteArrayAsync();
 									}
 									else if (Descriptor.ParameterType == typeof(Stream))
 									{
-										value = httpContent.ReadAsStreamAsync().Result;
+										value = await httpContent.ReadAsStreamAsync();
 									}
 									else if (Descriptor.ParameterType == typeof(FileInfo))
 									{
 										var tempFileName = Path.GetTempFileName();
-										File.WriteAllBytes(tempFileName, httpContent.ReadAsByteArrayAsync().Result);
+										File.WriteAllBytes(tempFileName, await httpContent.ReadAsByteArrayAsync());
 										value = new FileInfo(tempFileName);
 									}
 									else if (Descriptor.ParameterType == typeof(string))
 									{
-										value = Convert.ToBase64String(httpContent.ReadAsByteArrayAsync().Result);
+										value = Convert.ToBase64String(await httpContent.ReadAsByteArrayAsync());
 									}
 								}
 							}
 						}
 						finally
 						{
-							ResetStream(actionContext.Request.Content.ReadAsStreamAsync().Result);
+							ResetStream(await actionContext.Request.Content.ReadAsStreamAsync());
 						}
 					}
 
@@ -88,8 +89,8 @@ namespace Kay.KWebApi
 
 					if (actionContext.Request.Content.IsFormData())
 					{
-						var formData = actionContext.Request.Content.ReadAsFormDataAsync().Result;
-						if (formData != null && formData.AllKeys.Any(x => x.Equals(Descriptor.ParameterName)))
+						var formData = await actionContext.Request.Content.ReadAsFormDataAsync();
+						if (formData != null && formData.AllKeys.Any(x => x.Equals(Descriptor.ParameterName, StringComparison.OrdinalIgnoreCase)))
 						{
 							value = ConvertValueToParameterType(formData[Descriptor.ParameterName]);
 						}
@@ -99,35 +100,28 @@ namespace Kay.KWebApi
 
 					if (actionContext.Request.Content?.Headers?.ContentType?.MediaType?.ToLower() == "application/json")
 					{
-						var json = actionContext.Request.Content.ReadAsStringAsync().Result;
+						var json = await actionContext.Request.Content.ReadAsStringAsync();
 						if (!string.IsNullOrWhiteSpace(json))
 						{
-							var jObject = JObject.Parse(json); // we expect a json object, must blow up otherwise
-							value = ConvertValueToParameterType(jObject.Property(Descriptor.ParameterName));
+							var jObject = JsonConvert.DeserializeObject<JObject>(json, KHelper.JsonSerializerSettings); // we expect a json object, must blow up otherwise
+							value = ConvertValueToParameterType(jObject.Properties().Where(x => x.Name.Equals(Descriptor.ParameterName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault());
 						}
 					}
 				}
-				catch
+				catch (Exception ex)
 				{
 					value = Descriptor.DefaultValue;
 				}
 				finally
 				{
-					ResetStream(actionContext.Request.Content.ReadAsStreamAsync().Result);
+					ResetStream(await actionContext.Request.Content.ReadAsStreamAsync());
 					SetValue(actionContext, value);
 				}
 			}
-
-			// return completed task
-
-			var tcs = new TaskCompletionSource<object>();
-			tcs.SetResult(null);
-			return tcs.Task;
 		}
 
 		private void ResetStream(Stream stream)
 		{
-			var actionDescriptor = Descriptor.ActionDescriptor;
 			if (stream == null || stream.Position == 0) return;
 			stream.Seek(0, SeekOrigin.Begin);
 		}
@@ -141,7 +135,7 @@ namespace Kay.KWebApi
 			}
 			catch (ArgumentException ae)
 			{
-				if (ae.Message.Contains("Can not convert Null to Guid")) return Descriptor.DefaultValue;
+				if (ae.Message.Contains("Null to Guid")) return Descriptor.DefaultValue;
 				throw ae;
 			}
 		}
@@ -155,7 +149,7 @@ namespace Kay.KWebApi
 			}
 			catch (ArgumentException ae)
 			{
-				if (ae.Message.Contains("Can not convert Null to Guid")) return Descriptor.DefaultValue;
+				if (ae.Message.Contains("Null to Guid")) return Descriptor.DefaultValue;
 				else throw ae;
 			}
 		}
