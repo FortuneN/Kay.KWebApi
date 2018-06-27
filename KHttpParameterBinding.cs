@@ -122,8 +122,9 @@ namespace Kay.KWebApi
 
 		private void ResetStream(Stream stream)
 		{
-			if (stream == null || stream.Position == 0) return;
-			stream.Seek(0, SeekOrigin.Begin);
+			try { if (stream == null || stream.Position == 0) return; } catch { /*ignore*/ }
+			try { stream.Position = 0; } catch { /*ignore*/ }
+			try { stream.Seek(0, SeekOrigin.Begin); } catch { /*ignore*/ }
 		}
 
 		private object ConvertValueToParameterType(string value)
